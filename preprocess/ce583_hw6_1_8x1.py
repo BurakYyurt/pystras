@@ -110,8 +110,8 @@ for i in boundary:
         dof_id = dof_matrix[node_id, 1]
         u_node[dof_id] = i["y"]
 
-members = [fel.QuadBilinear(connectivity[i], coordinates[connectivity[i]],
-                            dof_matrix[connectivity[i]], 3) for i in range(n_quad)]
+members = [fel.QuadBilinearIncompatible(connectivity[i], coordinates[connectivity[i]],
+                                        dof_matrix[connectivity[i]], 3) for i in range(n_quad)]
 for i in members:
     i.element_properties(dimension_z)
     i.material_properties(E, v, 0)

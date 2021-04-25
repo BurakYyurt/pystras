@@ -1,5 +1,5 @@
 import numpy as np
-import scripts.element_library as fel
+from scripts import element_library as fel
 
 # ---------------------------------------------- Model Creation ------------------------------------------------------ #
 # This module creates a cantilever from bricks with 8 corner nodes.
