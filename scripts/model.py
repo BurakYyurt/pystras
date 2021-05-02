@@ -30,6 +30,6 @@ class Model:
         pickle.dump(self.members, file)
         shape = self.dof_matrix.shape[1]
         np.savetxt("Disp" + self.name + ".csv",
-                   self.U.reshape(int(len(self.U) / shape), shape), delimiter=",")
+                   self.U.reshape(int(len(self.U) / shape), shape), delimiter=";")
         np.savetxt("React" + self.name + ".csv",
-                   self.R.reshape(int(len(self.R) / shape), shape), delimiter=",")
+                   self.R.reshape(int(len(self.R) / shape), shape), delimiter=";")

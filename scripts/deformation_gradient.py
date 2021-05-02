@@ -13,5 +13,9 @@ def deformation_gradient(element, x0, U, location):
     return X_0_t, rhot
 
 
-def deformation_gradient_rate(gradient_tdt, gradient_t, dt):
-    return (gradient_tdt - gradient_t) / dt
+def deformation_gradient_rate(element, x0, dU, dt, location):
+    xi, eta, zeta = location
+    _, _, _, _, J0 = element.shape_functions(xi, eta, zeta, x0)
+    _, _, _, _, Jdott = element.shape_functions(xi, eta, zeta, dU / dt)
+
+    return np.dot(np.linalg.inv(J0), Jdott).T

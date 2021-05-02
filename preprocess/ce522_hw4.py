@@ -1,5 +1,5 @@
 import numpy as np
-from scripts import element_library as fel
+from scripts.ElementLibraries import brickBilinear as fel
 
 E = 200000
 v = 0.3
@@ -29,7 +29,7 @@ deltaU = np.array([[1, 1, 2],
                    [2, 2, 1],
                    [2, 2, 2],
                    [3, 4, 4],
-                   [3, 4, 20],
+                   [3, 4, 2],
                    [4, 8, 2],
                    [4, 8, 4]])
 

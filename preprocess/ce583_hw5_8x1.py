@@ -1,5 +1,5 @@
 import numpy as np
-from scripts import element_library as fel
+from scripts.ElementLibraries import quadBilinear as fel
 
 # ---------------------------------------------- Model Creation ------------------------------------------------------ #
 # This module creates a cantilever from bricks with 8 corner nodes.
@@ -110,8 +110,8 @@ for i in boundary:
         dof_id = dof_matrix[node_id, 1]
         u_node[dof_id] = i["y"]
 
-members = [fel.QuadBilinearIncompatible(connectivity[i], coordinates[connectivity[i]],
-                                        dof_matrix[connectivity[i]], 3) for i in range(n_quad)]
+members = [fel.QuadBilinear(connectivity[i], coordinates[connectivity[i]],
+                            dof_matrix[connectivity[i]], 3) for i in range(n_quad)]
 for i in members:
     i.element_properties(dimension_z)
     i.material_properties(E, v, 0)

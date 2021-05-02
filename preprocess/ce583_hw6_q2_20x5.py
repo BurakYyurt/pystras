@@ -1,5 +1,5 @@
 import numpy as np
-from scripts import element_library as fel
+from scripts.ElementLibraries import quadIncompatibleBilinear as fel
 
 # ---------------------------------------------- Model Creation ------------------------------------------------------ #
 # This module creates a cantilever from bricks with 8 corner nodes.
@@ -12,8 +12,8 @@ dimension_x = 4000  # mm, length
 dimension_y = 600  # mm, height
 dimension_z = 400  # mm, thickness
 
-division_x = 8  # division count in x direction
-division_y = 2  # division count in y direction
+division_x = 20  # division count in x direction
+division_y = 5  # division count in y direction
 
 # Materials
 E = 25000  # Young's Modulus N/mm2
@@ -22,10 +22,19 @@ v = 0.0  # Poisson's Ratio
 # Prescribed displacements at nodes
 boundary = [{"node_id": 0, "x": 0, "y": 0},
             {"node_id": 1, "x": 0, "y": 0},
-            {"node_id": 2, "x": 0, "y": 0}]
+            {"node_id": 2, "x": 0, "y": 0},
+            {"node_id": 3, "x": 0, "y": 0},
+            {"node_id": 4, "x": 0, "y": 0},
+            {"node_id": 5, "x": 0, "y": 0},
+            ]
 
 # Prescribed forces at nodes
-nodal_forces = [{"node_id": 26, "y": -20000}]
+nodal_forces = [{"node_id": 125, "y": -20000/6},
+                {"node_id": 124, "y": -20000/6},
+                {"node_id": 123, "y": -20000/6},
+                {"node_id": 122, "y": -20000/6},
+                {"node_id": 121, "y": -20000/6},
+                {"node_id": 120, "y": -20000/6}]
 
 # Prescribed forces at edges
 # TODO

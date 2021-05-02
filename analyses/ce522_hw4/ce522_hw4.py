@@ -1,39 +1,54 @@
 import numpy as np
 import pickle
-import preprocess.ce583_hw6_q2_8x1 as ce583_hw6
+import preprocess.ce522_hw4 as ce522_hw4
 from scripts import model, strain, stress
 from scripts import deformation_gradient as df
-import matplotlib.pyplot as plt
 
-name = "583_q2_8x1"
-fea_model = model.Model(name, ce583_hw6)
-fea_model.assemble()
-fea_model.solve()
+name = "522"
+fea_model = model.Model(name, ce522_hw4)
 
-cnt = 0
-mesh_cnt = 1
-str_out = np.zeros((1001, 3))
-coords = np.zeros((1001, 2))
+member = fea_model.members[0]
 
-start = int(-1000 / mesh_cnt / 2)
-end = int(1000 / mesh_cnt / 2) + 1
+Ut = ce522_hw4.Ut.flatten()
+x0 = member.coordinates
 
-for i in range(mesh_cnt):
-    for j in range(start, end):
-        member = fea_model.members[i]
-        eps = strain.engineering_strain(member, fea_model.U, [-1, j / start])
-        stress_val = stress.engineering_stress(eps, member.C)
-        N, _, _, _ = member.shape_functions(-1, j / start)
-        x, y = np.dot(N, member.coordinates)
-        str_out[cnt] = stress_val[:]
-        coords[cnt] = [x, y]
-        cnt += 1
+location = [0, 0, 0]
+X_0_t, rho_t = df.deformation_gradient(member, x0, Ut, location)
+Eps_0_t = strain.green_lagrange(X_0_t)
 
-plt.plot(str_out[:, 2], coords[:, 1])
-plt.show()
+xt = x0 + Ut
+dU = ce522_hw4.deltaU.flatten()
+X_t_tdt, rho_t_tdt = df.deformation_gradient(member, xt, dU, location)
+X_0_tdt = np.dot(X_0_t, X_t_tdt)
 
-print(stress_val)
-np.savetxt("stress_8x1.csv", str_out, delimiter=",")
-np.savetxt("coordinates.csv", coords, delimiter=",")
+Eps_0_tdt = strain.green_lagrange(X_0_tdt)
 
-fea_model.dump()
+e_t = strain.engineering_strain(X_t_tdt)
+e_0 = np.dot(np.dot(X_0_t.T, e_t), X_0_t)
+
+dt = 1
+
+Xdot_0_t = df.deformation_gradient_rate(member, x0, Ut, 10, location)
+Epsdot_0_t = strain.green_lagrange_rate(X_0_t, Xdot_0_t)
+
+X_t_0 = np.linalg.inv(X_0_t)
+v_t = np.dot(np.dot(X_t_0.T, Epsdot_0_t), X_t_0)
+
+print("X_0_t:")
+print(X_0_t)
+print("X_t_tdt:")
+print(X_t_tdt)
+print("X_0_tdt:")
+print(X_0_tdt)
+print("rho_t:")
+print(rho_t)
+print("Eps_0_t")
+print(Eps_0_t)
+print("Eps_0_tdt")
+print(Eps_0_tdt)
+print("e_t")
+print(e_t)
+print("e_0")
+print(e_0)
+print("v_t")
+print(v_t)
