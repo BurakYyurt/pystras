@@ -46,7 +46,7 @@ n_boundary = 0
 f_node = 0
 u_node = 0
 
-members = [fel.BrickBilinear(connectivity, coordinates,
+members = [fel.element(connectivity, coordinates,
                              dof_matrix, 3)]
 for i in members:
     i.material_properties(E, v, rho)

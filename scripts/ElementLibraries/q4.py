@@ -2,14 +2,13 @@ import numpy as np
 from scripts import integral
 
 
-class QuadBilinearIncompatible:
+class element:
     def __init__(self, nodes, coordinates, dofs, integration):
         self.nodes = nodes
         self.coordinates = coordinates.flatten()
         self.dofs = dofs.flatten()
         self.integral = integral.gauss_2D
         self.integration_points = integration
-        self.u_member = np.zeros(12)
 
     def element_properties(self, thickness, membrane_type="PlaneStress"):
         self.membrane_type = membrane_type
@@ -56,7 +55,7 @@ class QuadBilinearIncompatible:
 
         return N, dNdxi, dNdeta, J
 
-    def strain_displacement(self, xi, eta):
+    def strain_displacement(self, xi, eta, generalized=False):
         N, dNdxi, dNdeta, J = self.shape_functions(xi, eta)
 
         detJ = np.linalg.det(J)
@@ -65,7 +64,6 @@ class QuadBilinearIncompatible:
         S = np.zeros((3, 4))
         G = np.zeros((4, 8))
         A = np.zeros((4, 4))
-        B = np.zeros((3, 12))
 
         S[0, 0] = 1
         S[1, 3] = 1
@@ -80,59 +78,20 @@ class QuadBilinearIncompatible:
         G[[2], :] = dNdxi[1]
         G[[3], :] = dNdeta[1]
 
-        Bu = np.dot(np.dot(S, A), G)
-
-        Ba = np.zeros((3, 4))
-        Ba[0, 0] = -invJ[0, 0] * 2 * xi
-        Ba[0, 1] = -invJ[0, 1] * 2 * eta
-
-        Ba[1, 2] = -invJ[1, 0] * 2 * xi
-        Ba[1, 3] = -invJ[1, 1] * 2 * eta
-
-        Ba[2, 0] = -invJ[1, 0] * 2 * xi
-        Ba[2, 1] = -invJ[1, 1] * 2 * eta
-        Ba[2, 2] = -invJ[0, 0] * 2 * xi
-        Ba[2, 3] = -invJ[0, 1] * 2 * eta
-
-        B[:, :8] = Bu
-        B[:, 8:] = Ba
+        B = np.dot(np.dot(S, A), G)
 
         return B, detJ
 
     def stiffness(self, xi, eta):
-        # Stiffness for a single integration point
         B, detJ = self.strain_displacement(xi, eta)
         return np.dot(np.dot(B.T, self.C), B) * detJ * self.t
 
     def force(self, xi, eta):
-        # Force for a single integration point
         N, _, _, J = self.shape_functions(xi, eta)
         detJ = np.linalg.det(J)
         return np.dot(N.T, self.f_body) * detJ
 
-    def integrate(self, condensed=True):
+    def integrate(self):
         k_elem = self.integral(self.stiffness)
         f_elem = self.integral(self.force)
-
-        if not condensed:
-            return k_elem, f_elem
-        else:
-            Krr = k_elem[:8, :8]
-            Krc = k_elem[:8, 8:]
-            Kcc_inv = np.linalg.inv(k_elem[8:, 8:])
-
-            k_elem_condensed = Krr - np.dot(np.dot(Krc, Kcc_inv), Krc.T)
-
-            return k_elem_condensed, f_elem
-
-    def get_strain(self, U, location):
-        xi, eta = location
-        k_elem, f_elem = self.integrate(condensed=False)
-
-        Krc = k_elem[:8, 8:]
-        Kcc_inv = np.linalg.inv(k_elem[8:, 8:])
-        u_generalized = np.dot(Kcc_inv, -np.dot(Krc.T, U))
-        B, _ = self.strain_displacement(xi, eta)
-        self.u_member[:8] = U
-        self.u_member[8:] = u_generalized
-        return np.dot(B, self.u_member)
+        return k_elem, f_elem

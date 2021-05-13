@@ -66,9 +66,7 @@ for k, i in enumerate(selected_members):
 
     xi = xi_start
     eta = eta_start
-    print("next")
     for j in range(steps+1):
-        print(xi,eta)
         xi2 = 1 - xi ** 2
         eta2 = 1 - eta ** 2
         Na[0, 0] = xi2

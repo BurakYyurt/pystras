@@ -141,7 +141,7 @@ for i in boundary:
         dof_id = dof_matrix[node_id, 2]
         u_node[dof_id] = i["z"]
 
-members = [fel.BrickBilinear(connectivity[i], coordinates[connectivity[i]],
+members = [fel.element(connectivity[i], coordinates[connectivity[i]],
                              dof_matrix[connectivity[i]], 3) for i in range(n_brick)]
 for i in members:
     i.material_properties(E, v, 0)

@@ -2,7 +2,7 @@ import numpy as np
 from scripts import integral
 
 
-class BrickBilinear:
+class element:
     def __init__(self, nodes, coordinates, dofs, integration):
         self.nodes = nodes
         self.coordinates = coordinates.flatten()
